@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"strings"
 	"time"
@@ -8,6 +9,9 @@ import (
 	"github.com/Prayas-35/ragkit/engine/config"
 	"github.com/Prayas-35/ragkit/engine/internal/database"
 	"github.com/Prayas-35/ragkit/engine/internal/rabbitmq"
+	"github.com/Prayas-35/ragkit/engine/internal/routes"
+	"github.com/Prayas-35/ragkit/engine/internal/vector"
+	"github.com/Prayas-35/ragkit/engine/internal/worker"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -76,6 +80,41 @@ func main() {
 		log.Println("✅ Connected to RabbitMQ")
 	}
 	defer rabbitmqConn.Close()
+
+	ch, err := rabbitmqConn.Channel()
+	if err != nil {
+		log.Fatal("Failed to open RabbitMQ channel:", err)
+	}
+	defer ch.Close()
+
+	// Ensure the ingest queue exists
+	_, err = ch.QueueDeclare(
+		"rag_ingest",
+		true,
+		false,
+		false,
+		false,
+		nil,
+	)
+	if err != nil {
+		log.Fatal("Failed to declare rag_ingest queue:", err)
+	}
+
+	// Start background worker for ingestion
+	embedder, err := vector.NewGeminiEmbedder(context.Background())
+	if err != nil {
+		log.Fatal("Failed to create Gemini embedder:", err)
+	}
+
+	store := &vector.Store{
+		DB:       database.DB,
+		Embedder: embedder,
+	}
+
+	worker.StartWorker(ch, store)
+
+	// Register application routes
+	routes.Register(app, ch)
 
 	app.Get("/health",
 		func(c *fiber.Ctx) error {

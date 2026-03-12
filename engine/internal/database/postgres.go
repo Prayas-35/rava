@@ -8,7 +8,9 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	pgxvec "github.com/pgvector/pgvector-go/pgx"
 )
 
 var DB *pgxpool.Pool
@@ -20,7 +22,15 @@ func Connect() {
 		log.Fatal("DATABASE_URL not set")
 	}
 
-	dbpool, err := pgxpool.New(context.Background(), dsn)
+	poolConfig, err := pgxpool.ParseConfig(dsn)
+	if err != nil {
+		log.Fatal("Failed to parse database config:", err)
+	}
+	poolConfig.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
+		return pgxvec.RegisterTypes(ctx, conn)
+	}
+
+	dbpool, err := pgxpool.NewWithConfig(context.Background(), poolConfig)
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}
