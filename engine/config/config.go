@@ -8,10 +8,11 @@ import (
 )
 
 type Config struct {
-	DatabaseUri string
-	ServerPort  string
-	JWTSecret   string
-	DB_SYNC     bool
+	DatabaseUri  string
+	ServerPort   string
+	JWTSecret    string
+	DB_SYNC      bool
+	RABBITMQ_URL string
 }
 
 func LoadConfig() Config {
@@ -29,9 +30,10 @@ func LoadConfig() Config {
 	}
 
 	return Config{
-		DatabaseUri: os.Getenv("DATABASE_URL"),
-		ServerPort:  port,
-		JWTSecret:   os.Getenv("JWT_SECRET"),
-		DB_SYNC:     os.Getenv("DB_SYNC") == "true",
+		DatabaseUri:  os.Getenv("DATABASE_URL"),
+		ServerPort:   port,
+		JWTSecret:    os.Getenv("JWT_SECRET"),
+		DB_SYNC:      os.Getenv("DB_SYNC") == "true",
+		RABBITMQ_URL: os.Getenv("RABBITMQ_URL"),
 	}
 }

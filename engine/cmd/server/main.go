@@ -7,6 +7,7 @@ import (
 
 	"github.com/Prayas-35/ragkit/engine/config"
 	"github.com/Prayas-35/ragkit/engine/internal/database"
+	"github.com/Prayas-35/ragkit/engine/internal/rabbitmq"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -69,6 +70,12 @@ func main() {
 
 	// Initialize database connection
 	database.Connect()
+
+	rabbitmqConn := rabbitmq.Connect()
+	if rabbitmqConn != nil {
+		log.Println("✅ Connected to RabbitMQ")
+	}
+	defer rabbitmqConn.Close()
 
 	app.Get("/health",
 		func(c *fiber.Ctx) error {

@@ -5,7 +5,9 @@ import (
 	"log"
 
 	"github.com/Prayas-35/ragkit/engine/config"
-
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -23,58 +25,32 @@ func Connect() {
 		log.Fatal("Failed to connect to database:", err)
 	}
 
+	if err := dbpool.Ping(context.Background()); err != nil {
+		log.Fatal("Failed to ping database:", err)
+	}
+
 	DB = dbpool
 	log.Println("✅ Connected to Neon PostgreSQL")
 
 	if cfg.DB_SYNC {
 		log.Println("🔄 Running database migrations...")
-		if err := migrate(dbpool); err != nil {
+		if err := runMigrations(dsn); err != nil {
 			log.Fatal("Failed to run migrations:", err)
 		}
 	}
 }
 
-func migrate(pool *pgxpool.Pool) error {
+func runMigrations(dsn string) error {
+	m, err := migrate.New("file://migrations", dsn)
+	if err != nil {
+		return err
+	}
+	defer m.Close()
 
-	ctx := context.Background()
-
-	userTable := `
-	CREATE TABLE IF NOT EXISTS users (
-		id UUID PRIMARY KEY,
-		name TEXT,
-		email TEXT UNIQUE,
-		password TEXT,
-		created_at TIMESTAMP DEFAULT now()
-	);
-	`
-
-	bookTable := `
-	CREATE TABLE IF NOT EXISTS books (
-		id UUID PRIMARY KEY,
-		title TEXT,
-		author TEXT,
-		available BOOLEAN DEFAULT true
-	);
-	`
-
-	issueTable := `
-	CREATE TABLE IF NOT EXISTS issues (
-		id UUID PRIMARY KEY,
-		user_id UUID REFERENCES users(id),
-		book_id UUID REFERENCES books(id),
-		issued_at TIMESTAMP DEFAULT now(),
-		returned_at TIMESTAMP
-	);
-	`
-
-	queries := []string{userTable, bookTable, issueTable}
-
-	for _, q := range queries {
-		_, err := pool.Exec(ctx, q)
-		if err != nil {
-			return err
-		}
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+		return err
 	}
 
+	log.Println("✅ Migrations applied successfully")
 	return nil
 }
