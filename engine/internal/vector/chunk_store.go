@@ -24,6 +24,30 @@ type Store struct {
 	Embedder *GeminiEmbedder
 }
 
+type SearchResult struct {
+	Content    string
+	DocumentID string
+	ChunkIndex int
+	Score      float32
+}
+
+const embeddingDim = 1536
+
+func normalizeEmbeddingDim(embedding []float32) []float32 {
+	if len(embedding) == embeddingDim {
+		return embedding
+	}
+
+	vec := make([]float32, embeddingDim)
+	if len(embedding) > embeddingDim {
+		copy(vec, embedding[:embeddingDim])
+		return vec
+	}
+
+	copy(vec, embedding)
+	return vec
+}
+
 func (s *Store) BulkInsertChunks(ctx context.Context, rows []ChunkRow) error {
 
 	var data [][]any
@@ -34,18 +58,10 @@ func (s *Store) BulkInsertChunks(ctx context.Context, rows []ChunkRow) error {
 			continue
 		}
 
-		// Ensure embedding length matches the database vector dimension (1536)
-		const embeddingDim = 1536
 		if len(r.Embedding) != embeddingDim {
 			log.Println("BulkInsertChunks: adjusting embedding length",
 				"from", len(r.Embedding), "to", embeddingDim, "for document", r.DocumentID)
-			vec := make([]float32, embeddingDim)
-			if len(r.Embedding) > embeddingDim {
-				copy(vec, r.Embedding[:embeddingDim])
-			} else {
-				copy(vec, r.Embedding)
-			}
-			r.Embedding = vec
+			r.Embedding = normalizeEmbeddingDim(r.Embedding)
 		}
 
 		meta, _ := json.Marshal(r.Metadata)
@@ -82,4 +98,118 @@ func (s *Store) BulkInsertChunks(ctx context.Context, rows []ChunkRow) error {
 	)
 
 	return err
+}
+
+func (s *Store) VectorSearch(
+	ctx context.Context,
+	projectID string,
+	query string,
+	limit int,
+) ([]SearchResult, error) {
+
+	// 1. Embed query
+	embedding, err := s.Embedder.Embed(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(embedding) != embeddingDim {
+		embedding = normalizeEmbeddingDim(embedding)
+	}
+
+	vec := pgvector.NewVector(embedding)
+
+	// 2. Run vector similarity search
+	rows, err := s.DB.Query(
+		ctx,
+		`
+		SELECT 
+			content,
+			document_id,
+			chunk_index,
+			embedding <-> $1 AS score
+		FROM chunks
+		WHERE project_id = $2
+		ORDER BY embedding <-> $1
+		LIMIT $3
+		`,
+		vec,
+		projectID,
+		limit,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var results []SearchResult
+
+	for rows.Next() {
+
+		var r SearchResult
+
+		err := rows.Scan(
+			&r.Content,
+			&r.DocumentID,
+			&r.ChunkIndex,
+			&r.Score,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		results = append(results, r)
+	}
+
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+
+	if len(results) > 0 {
+		return results, nil
+	}
+
+	rows, err = s.DB.Query(
+		ctx,
+		`
+		SELECT
+			content,
+			document_id,
+			chunk_index,
+			0.0 AS score
+		FROM chunks
+		WHERE project_id = $1
+		ORDER BY created_at DESC
+		LIMIT $2
+		`,
+		projectID,
+		limit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var r SearchResult
+		err := rows.Scan(
+			&r.Content,
+			&r.DocumentID,
+			&r.ChunkIndex,
+			&r.Score,
+		)
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, r)
+	}
+
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+
+	return results, nil
 }
