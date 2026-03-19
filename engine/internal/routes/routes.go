@@ -18,6 +18,7 @@ func Register(app *fiber.App, ch *amqp.Channel, store *vector.Store) {
 	api.Post("/users", userController.CreateUser())
 	api.Post("/projects", projectController.CreateProject())
 	api.Post("/projects/:project_id/keys", apiKeyController.CreateAPIKey())
+	api.Put("/projects/:project_id/agent-prompt", projectController.UpdateAgentPrompt())
 	api.Post("/ingest", documentController.IngestDocument())
 	api.Post("/query", generateController.Query())
 }
