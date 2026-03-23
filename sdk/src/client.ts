@@ -7,14 +7,14 @@ export interface ClientConfig {
     baseUrl?: string
 }
 
-export class RagClient {
+export class RavaClient {
     private client: AxiosInstance
-    private static instance: RagClient | null = null
+    private static instance: RavaClient | null = null
     private static config: ClientConfig | null = null
 
     constructor(config: ClientConfig) {
         this.client = axios.create({
-            baseURL: config.baseUrl || "https://api.ragkit.dev",
+            baseURL: config.baseUrl || "https://api.rava.dev",
             headers: {
                 Authorization: `Bearer ${config.apiKey}`,
                 "Content-Type": "application/json",
@@ -26,33 +26,33 @@ export class RagClient {
      * Initialize the singleton instance.
      * Call this once at your app startup before using the client.
      */
-    static initialize(config: ClientConfig): RagClient {
-        if (!RagClient.instance) {
-            RagClient.config = config
-            RagClient.instance = new RagClient(config)
+    static initialize(config: ClientConfig): RavaClient {
+        if (!RavaClient.instance) {
+            RavaClient.config = config
+            RavaClient.instance = new RavaClient(config)
         }
-        return RagClient.instance
+        return RavaClient.instance
     }
 
     /**
      * Get the singleton instance.
      * Make sure to call initialize() first.
      */
-    static getInstance(): RagClient {
-        if (!RagClient.instance) {
+    static getInstance(): RavaClient {
+        if (!RavaClient.instance) {
             throw new Error(
-                "RagClient not initialized. Call RagClient.initialize(config) first."
+                "RavaClient not initialized. Call RavaClient.initialize(config) first."
             )
         }
-        return RagClient.instance
+        return RavaClient.instance
     }
 
     /**
      * Reset the singleton instance (useful for testing).
      */
     static reset(): void {
-        RagClient.instance = null
-        RagClient.config = null
+        RavaClient.instance = null
+        RavaClient.config = null
     }
 
     async query(input: QueryInput) {
