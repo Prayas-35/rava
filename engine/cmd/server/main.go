@@ -22,7 +22,7 @@ import (
 func main() {
 	app := fiber.New(
 		fiber.Config{
-			AppName: "ragkit",
+			AppName: "rava",
 		},
 	)
 
