@@ -8,6 +8,7 @@ import (
 
 	"github.com/Prayas-35/ragkit/engine/config"
 	"github.com/Prayas-35/ragkit/engine/internal/database"
+	"github.com/Prayas-35/ragkit/engine/internal/middleware"
 	"github.com/Prayas-35/ragkit/engine/internal/rabbitmq"
 	"github.com/Prayas-35/ragkit/engine/internal/routes"
 	"github.com/Prayas-35/ragkit/engine/internal/vector"
@@ -69,6 +70,9 @@ func main() {
 		Expiration:   30 * time.Minute,
 		CacheControl: true,
 	}))
+
+	// Rate limiting middleware - 10 requests per second per API key
+	app.Use(middleware.RateLimiting())
 
 	cfg := config.LoadConfig()
 

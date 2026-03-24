@@ -39,7 +39,7 @@ func (dc *DocumentController) IngestDocument() fiber.Handler {
 			return fiber.NewError(fiber.StatusBadRequest, "name and content are required")
 		}
 
-		docID, err := service.QueueDocumentIngestion(dc.ch, projectID, req)
+		docID, err := service.IngestDocumentIdempotent(dc.ch, projectID, req)
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 		}
