@@ -14,7 +14,7 @@ export async function query(
     client: AxiosInstance,
     input: QueryInput
 ): Promise<QueryResponse> {
-    const res = await client.post("/query", {
+    const res = await client.post("/api/query", {
         question: input.question,
         history: input.history || [],
         top_k: input.top_k || 5,

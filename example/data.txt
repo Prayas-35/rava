@@ -1,0 +1,42 @@
+Retrieval-Augmented Generation (RAG) is a technique used to improve the accuracy and relevance of Large Language Models (LLMs) by connecting them to external, up-to-date data sources rather than relying solely on their static training data. 
+IBM
+IBM
+ +1
+Here is a collection of random facts, data points, and technical details regarding RAG:
+1. Origins and Definition
+Coined in 2020: The term "RAG" was coined by Patrick Lewis in a 2020 paper titled Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks.
+The Core Concept: RAG acts as a search engine for LLMs, enabling them to consult internal, private, or real-time documents before generating an answer.
+Core Goal: Its primary purpose is to lower the risk of AI hallucinations (made-up facts) and provide up-to-date information. 
+Wikipedia
+Wikipedia
+ +4
+2. Technical Components
+Vector Database: RAG commonly uses vector databases to store and index data. Popular options include Pinecone, Milvus, Weaviate, Chroma, and PG Vector.
+Embeddings: Text is converted into numerical representations (embeddings) to allow semantic searching (matching meaning rather than just keywords).
+Chunking: Documents are split into smaller "chunks" (e.g., 2048 characters) for better retrieval accuracy, often with overlap to preserve context.
+Frameworks: Popular frameworks to build RAG applications include LangChain, Llama Index, and Hugging Face. 
+IBM Research
+IBM Research
+ +4
+3. Key Data & Metrics
+Performance vs. Retrieval: The "Hybrid with HyDE" retrieval method achieved a high RAG score of 0.58, but can have a high latency of 11.71 seconds per query.
+Reranking is Critical: Without a reranking module, RAG performance often drops significantly; MonoT5 is mentioned as an effective reranker.
+Poisoning Vulnerability: Research into "BadRAG" shows that poisoning just 0.04% of a data corpus can cause up to a 98.2% attack success rate, leading to 74.6% system failure.
+Cost Reduction: RAG is often more cost-effective than fine-tuning an LLM, as it allows for updating knowledge without retraining the model. 
+IBM Research
+IBM Research
+ +4
+4. Interesting Nuances
+RAG vs. Structured Data: Traditional RAG is designed for unstructured text (PDFs, blogs) and often struggles with structured data (SQL, sales reports) because converting tables into text "blobs" loses relationship context.
+Bad for Math: While RAG is great for finding text, it is not optimized for counting, calculating, or complex data analysis.
+It’s Not Just Vector DBs: While frequently used, RAG is not exclusively dependent on vector databases. It is more accurately described as any automation process that retrieves information to augment generation. 
+Reddit
+Reddit
+ +4
+5. Other Meanings
+Project Management: "RAG" also stands for Red, Amber, Green—a color-coding system for status reporting.
+Operating Systems: It can stand for Resource Allocation Graph, used for deadlock detection
+
+
+heheheehe
+jopdpsbncoisdhcsd;ln

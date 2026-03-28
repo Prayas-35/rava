@@ -7,12 +7,27 @@ export interface IngestMetadata {
 
 export interface IngestInput {
     name: string
-    text?: string
+    content?: string
+    filePath?: string
     metadata?: IngestMetadata
 }
 
 export interface IngestResponse {
     status: string
+}
+
+async function resolveContent(input: IngestInput): Promise<string> {
+    if (input.content && input.content.trim() !== "") {
+        return input.content
+    }
+
+    if (input.filePath && input.filePath.trim() !== "") {
+        // Load fs lazily so browser consumers that only use content are unaffected.
+        const { readFile } = await import("node:fs/promises")
+        return readFile(input.filePath, "utf8")
+    }
+
+    throw new Error("Either content or filePath is required")
 }
 
 export async function ingest(
@@ -24,9 +39,11 @@ export async function ingest(
         throw new Error("metadata is required")
     }
 
-    const res = await client.post("/ingest", {
+    const content = await resolveContent(input)
+
+    const res = await client.put("/api/ingest", {
         name: input.name,
-        content: input.text,
+        content,
         metadata: input.metadata,
     })
 

@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "ES2020",
+        "moduleResolution": "node",
+        "ignoreDeprecations": "6.0",
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "strict": true,
+        "types": ["node"],
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "rootDir": "src",
+        "outDir": "dist"
+    }
+}

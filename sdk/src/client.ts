@@ -16,6 +16,7 @@ export class RavaClient {
         this.client = axios.create({
             baseURL: config.baseUrl || "https://api.rava.dev",
             headers: {
+                "X-API-Key": config.apiKey,
                 Authorization: `Bearer ${config.apiKey}`,
                 "Content-Type": "application/json",
             },
