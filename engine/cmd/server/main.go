@@ -29,7 +29,7 @@ func main() {
 	)
 
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "http://localhost:3000,http://localhost:3001,https://altr-ai.vercel.app,https://undimly-swirly-daine.ngrok-free.dev",
+		AllowOrigins:     "http://localhost:3000,http://localhost:3001,https://altr-ai.vercel.app,https://undimly-swirly-daine.ngrok-free.dev,https://ravaai.vercel.app",
 		AllowMethods:     strings.Join([]string{fiber.MethodGet, fiber.MethodHead, fiber.MethodPost, fiber.MethodPut, fiber.MethodDelete, fiber.MethodPatch, fiber.MethodOptions}, ","),
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization, X-API-Key",
 		AllowCredentials: true,
