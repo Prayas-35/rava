@@ -30,6 +30,11 @@ func CreateUser(ctx context.Context, req CreateUserRequest) (*User, error) {
 		return nil, err
 	}
 
+	exists := database.DB.QueryRow(ctx, `SELECT 1 FROM users WHERE email = $1`, req.Email)
+	if err := exists.Scan(new(int)); err == nil {
+		return nil, errors.New("email already in use")
+	}
+
 	row := database.DB.QueryRow(ctx,
 		`INSERT INTO users (email, name, password_hash) VALUES ($1, $2, $3)
 		RETURNING id, email, COALESCE(name, ''), created_at`,
