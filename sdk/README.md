@@ -33,7 +33,7 @@ import { RavaClient } from "@rava-ai/sdk"
 // At your app startup (e.g., main.ts, server.ts)
 RavaClient.initialize({
   apiKey: "your-api-key-here",
-  baseUrl: "https://rava-qfpo.onrender.com", // optional, defaults to https://rava-qfpo.onrender.com
+  baseUrl: "https://rava-ydvd.onrender.com", // optional, defaults to https://rava-ydvd.onrender.com
 })
 ```
 

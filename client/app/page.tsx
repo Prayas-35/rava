@@ -62,7 +62,7 @@ export default function Home() {
 // Initialize once during app startup
 RavaClient.initialize({
   apiKey: process.env.RAVA_API_KEY!,
-  baseUrl: process.env.RAVA_BASE_URL ?? 'https://rava-qfpo.onrender.com'
+  baseUrl: process.env.RAVA_BASE_URL ?? 'https://rava-ydvd.onrender.com'
 });
 
 const rava = RavaClient.getInstance();

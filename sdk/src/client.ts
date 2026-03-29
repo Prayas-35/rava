@@ -14,7 +14,7 @@ export class RavaClient {
 
     constructor(config: ClientConfig) {
         this.client = axios.create({
-            baseURL: config.baseUrl || "https://api.rava.dev",
+            baseURL: config.baseUrl || "https://rava-ydvd.onrender.com",
             headers: {
                 "X-API-Key": config.apiKey,
                 Authorization: `Bearer ${config.apiKey}`,
