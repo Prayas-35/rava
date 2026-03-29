@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { ArrowRight, Code2, Zap, Database, Brain, GitBranch, Shield } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function Home() {
   return (
@@ -9,8 +10,14 @@ export default function Home() {
       <nav className="border-b border-zinc-900 bg-black/50 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-linear-to-br from-indigo-500 to-indigo-600 rounded flex items-center justify-center">
-              <span className="text-white font-bold text-sm">R</span>
+            <div className="w-8 h-8  rounded flex items-center justify-center">
+              <Image
+                src="/rava.jpeg"
+                alt="Rava logo"
+                width={24}
+                height={24}
+                className="rounded-sm object-cover"
+              />
             </div>
             <span className="text-xl font-bold"> Rava </span>
           </div>
@@ -57,7 +64,7 @@ export default function Home() {
                   <span className="text-xs text-zinc-500 ml-2">quick-start.js</span>
                 </div>
                 <pre className="text-sm text-zinc-300 font-mono overflow-auto">
-                  {`import { RavaClient } from 'rava';
+                  {`import { RavaClient } from '@rava-ai/sdk';
 
 // Initialize once during app startup
 RavaClient.initialize({

@@ -2,15 +2,14 @@ import Link from 'next/link'
 import { ArrowLeft, BookOpen, Braces, Terminal } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-const installSnippet = `pnpm add rava`
+const installSnippet = `pnpm add @rava-ai/sdk`
 
-const initSnippet = `import { RavaClient } from 'rava'
+const initSnippet = `import { RavaClient } from '@rava-ai/sdk'
 
 RavaClient.initialize({
   apiKey: process.env.RAVA_API_KEY!,
-  // Optional. Defaults to https://api.rava.dev
-  // Use your local engine during development if needed.
-  baseUrl: process.env.RAVA_BASE_URL ?? 'http://localhost:8080',
+  // Optional. Defaults to https://rava-ydvd.onrender.com
+  baseUrl: process.env.RAVA_BASE_URL ?? 'https://rava-ydvd.onrender.com',
 })`
 
 const ingestSnippet = `const client = RavaClient.getInstance()
@@ -39,42 +38,6 @@ const response = await client.query({
 
 console.log(response.answer)`
 
-const getApiKeyFlowSnippet = `// 1) Sign up (or sign in)
-const auth = await fetch('http://localhost:8080/api/auth/signup', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-        email: 'dev@example.com',
-        password: 'strong-password',
-        name: 'Dev User',
-    }),
-}).then((r) => r.json())
-
-const token = auth.token
-
-// 2) Create project (JWT determines user_id on backend)
-const project = await fetch('http://localhost:8080/api/projects', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-        Authorization: \`Bearer \${token}\`,
-    },
-    body: JSON.stringify({
-        name: 'my-first-project',
-        agent_prompt: 'You are a helpful assistant.',
-    }),
-}).then((r) => r.json())
-
-// 3) Generate API key for the project
-const key = await fetch(\`http://localhost:8080/api/projects/\${project.id}/keys\`, {
-    method: 'POST',
-    headers: {
-        Authorization: \`Bearer \${token}\`,
-    },
-}).then((r) => r.json())
-
-console.log(key.api_key)`
-
 export default function DocsPage() {
     return (
         <div className="dark min-h-screen bg-black text-white">
@@ -97,7 +60,7 @@ export default function DocsPage() {
                     <p className="text-zinc-400 text-lg leading-relaxed max-w-3xl">
                         This page reflects the current SDK implementation in this repository. It documents the exported
                         client, method signatures, default values, and required fields as implemented in the
-                        <span className="text-zinc-200"> rava </span>
+                        <span className="text-zinc-200"> rava-ai/sdk </span>
                         package.
                     </p>
                 </section>
@@ -185,18 +148,17 @@ export default function DocsPage() {
                 <section className="space-y-4">
                     <h2 className="text-2xl sm:text-3xl font-semibold">5) Get API key flow</h2>
                     <p className="text-zinc-400 leading-relaxed">
-                        Project creation no longer accepts user_id in the body. Authenticate first, then send
-                        a Bearer JWT token to create the project and generate API keys.
+                        You can obtain your project API key directly from the UI. Follow this path in the app:
                     </p>
-                    <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-5">
-                        <pre className="text-sm text-zinc-200 overflow-auto">{getApiKeyFlowSnippet}</pre>
-                    </div>
                     <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-5 text-sm text-zinc-300">
-                        <p className="font-medium text-white mb-2">Required headers</p>
+                        <p className="font-medium text-white mb-2">Steps in UI</p>
                         <ul className="space-y-2 list-disc list-inside text-zinc-400">
-                            <li>Project creation: Authorization: Bearer &lt;jwt&gt;</li>
-                            <li>API key generation: Authorization: Bearer &lt;jwt&gt;</li>
-                            <li>Ingest/query calls: X-API-Key: &lt;project-api-key&gt;</li>
+                            <li>From the home page, click <span className="text-zinc-200">Get started</span>.</li>
+                            <li>Sign up or sign in on the auth screen.</li>
+                            <li>You will be redirected to your dashboard.</li>
+                            <li>Click <span className="text-zinc-200">Create project</span> and submit the form.</li>
+                            <li>Once created, use <span className="text-zinc-200">Show API key</span> on that project.</li>
+                            <li>Copy the key and set it as <span className="text-zinc-200">RAVA_API_KEY</span> in your app.</li>
                         </ul>
                     </div>
                     <Button asChild className="px-6 py-3 rounded-full bg-white text-black hover:bg-zinc-100 font-medium">
