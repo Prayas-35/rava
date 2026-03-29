@@ -18,7 +18,7 @@ export default function Home() {
             <a href="#how" className="text-sm text-zinc-300 hover:text-white transition">How it works</a>
             <a href="#features" className="text-sm text-zinc-300 hover:text-white transition">Features</a>
             <a href="#usecases" className="text-sm text-zinc-300 hover:text-white transition">Use cases</a>
-            <Link href="#" className="px-4 py-2 rounded-full bg-white text-black text-sm font-medium hover:bg-zinc-100 transition">Get API key</Link>
+            <Link href="/docs" className="px-4 py-2 rounded-full bg-white text-black text-sm font-medium hover:bg-zinc-100 transition">Docs</Link>
           </div>
         </div>
       </nav>
@@ -38,11 +38,11 @@ export default function Home() {
                 No complex pipelines. No vector database management. Just one-line SDK integration and you&apos;re ready to retrieve and generate.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button className="h-12 px-6 rounded-full bg-white text-black hover:bg-zinc-100 font-medium text-base">
-                  Get Started <ArrowRight className="ml-2 w-4 h-4" />
+                <Button asChild className="h-12 px-6 rounded-full bg-white text-black hover:bg-zinc-100 font-medium text-base">
+                  <Link href="/auth">Get Started <ArrowRight className="ml-2 w-4 h-4" /></Link>
                 </Button>
-                <Button variant="outline" className="h-12 px-6 rounded-full border-zinc-700 text-white hover:bg-zinc-900 font-medium text-base">
-                  View Docs
+                <Button asChild variant="outline" className="h-12 px-6 rounded-full border-zinc-700 text-white hover:bg-zinc-900 font-medium text-base">
+                  <Link href="/docs">View Docs</Link>
                 </Button>
               </div>
             </div>
@@ -57,31 +57,28 @@ export default function Home() {
                   <span className="text-xs text-zinc-500 ml-2">quick-start.js</span>
                 </div>
                 <pre className="text-sm text-zinc-300 font-mono overflow-auto">
-                  {`import Rava from '@rava/sdk';
+                  {`import { RavaClient } from 'rava';
 
-// Initialize with API key
-const rava = new Rava({
-  apiKey: process.env.RAVA_API_KEY
+// Initialize once during app startup
+RavaClient.initialize({
+  apiKey: process.env.RAVA_API_KEY!,
+  baseUrl: process.env.RAVA_BASE_URL ?? 'http://localhost:8080'
 });
 
-try {
-  // Ingest data from source
-  await rava.ingest({
-    source: 'github',
-    repo: 'your-org/repo',
-    metadata: { type: 'docs' }
-  });
+const rava = RavaClient.getInstance();
 
-  // Query with RAG
-  const result = await rava.query({
-    question: 'How do I use RAG?',
-    topK: 5
-  });
+await rava.ingest({
+  name: 'product-docs',
+  content: 'RAG lets you answer questions from your own data.',
+  metadata: { type: 'text' }
+});
 
-  console.log(result.answer);
-} catch (error) {
-  console.error('RAG error:', error);
-}`}
+const result = await rava.query({
+  question: 'How do I initialize the SDK?',
+  top_k: 5
+});
+
+console.log(result.answer);`}
                 </pre>
               </div>
               <div className="absolute -top-4 -right-4 w-20 h-20 bg-indigo-500/10 rounded-full blur-2xl"></div>
@@ -219,15 +216,15 @@ try {
                 Simple, intuitive APIs designed for developers. No boilerplate, no headaches.
               </p>
               <ul className="space-y-4 mb-8">
-                {['Automatic chunking & embedding', 'Natural language queries', 'Streaming responses', 'Idempotent ingestion'].map((item) => (
+                {['Singleton client initialization', 'Natural language queries', 'File or text ingestion', 'Typed request and response models'].map((item) => (
                   <li key={item} className="flex items-center gap-3">
                     <div className="w-1.5 h-1.5 rounded-full bg-indigo-400"></div>
                     <span>{item}</span>
                   </li>
                 ))}
               </ul>
-              <Button className="px-6 py-3 rounded-full bg-white text-black hover:bg-zinc-100 font-medium">
-                Read the docs
+              <Button asChild className="px-6 py-3 rounded-full bg-white text-black hover:bg-zinc-100 font-medium">
+                <Link href="/docs">Read the docs</Link>
               </Button>
             </div>
 
@@ -239,28 +236,24 @@ try {
                 <span className="text-xs text-zinc-500 ml-2">example.js</span>
               </div>
               <pre className="text-sm text-zinc-300 font-mono overflow-auto">
-                {`// Query with streaming
-const result = await rava.query({
-  question: 'What is RAG?',
-  topK: 5,
-  streaming: true
+                {`// Reuse the singleton instance anywhere
+const rava = RavaClient.getInstance();
+
+await rava.ingest({
+  name: 'knowledge-base',
+  filePath: './data.txt',
+  metadata: { type: 'text' }
 });
 
-// Handle streaming response
-for await (const chunk of result.stream()) {
-  process.stdout.write(chunk.delta);
-}
+const response = await rava.query({
+  question: 'Summarize the ingested file',
+  history: [
+    { role: 'user', content: 'Keep it short.' }
+  ],
+  top_k: 3
+});
 
-// Get sources and metadata
-const answer = await result.text();
-const sources = result.sources?.map(
-  s => s.filename
-) ?? [];
-
-return {
-  answer,
-  sources
-};`}
+return response.answer;`}
               </pre>
             </div>
           </div>
@@ -327,11 +320,11 @@ return {
             Get your API key and start building in minutes. No credit card required.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button className="h-12 px-8 rounded-full bg-white text-black hover:bg-zinc-100 font-medium text-base">
-              Get API Key <ArrowRight className="ml-2 w-4 h-4" />
+            <Button asChild className="h-12 px-8 rounded-full bg-white text-black hover:bg-zinc-100 font-medium text-base">
+              <Link href="/auth">Get API Key <ArrowRight className="ml-2 w-4 h-4" /></Link>
             </Button>
-            <Button variant="outline" className="h-12 px-8 rounded-full border-zinc-700 text-white hover:bg-zinc-900 font-medium text-base">
-              View Documentation
+            <Button asChild variant="outline" className="h-12 px-8 rounded-full border-zinc-700 text-white hover:bg-zinc-900 font-medium text-base">
+              <Link href="/docs">View Documentation</Link>
             </Button>
           </div>
         </div>
@@ -355,7 +348,7 @@ return {
               <ul className="space-y-2 text-sm text-zinc-400">
                 <li><a href="#" className="hover:text-white transition">Features</a></li>
                 <li><a href="#" className="hover:text-white transition">Pricing</a></li>
-                <li><a href="#" className="hover:text-white transition">Documentation</a></li>
+                <li><Link href="/docs" className="hover:text-white transition">Documentation</Link></li>
               </ul>
             </div>
             <div>

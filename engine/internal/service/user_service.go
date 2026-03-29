@@ -2,11 +2,14 @@ package service
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/Prayas-35/ragkit/engine/internal/database"
 	"golang.org/x/crypto/bcrypt"
 )
+
+var ErrInvalidCredentials = errors.New("invalid email or password")
 
 type User struct {
 	ID        string    `json:"id"`
@@ -38,6 +41,26 @@ func CreateUser(ctx context.Context, req CreateUserRequest) (*User, error) {
 	var u User
 	if err := row.Scan(&u.ID, &u.Email, &u.Name, &u.CreatedAt); err != nil {
 		return nil, err
+	}
+
+	return &u, nil
+}
+
+func AuthenticateUser(ctx context.Context, email string, password string) (*User, error) {
+	row := database.DB.QueryRow(ctx,
+		`SELECT id, email, COALESCE(name, ''), created_at, password_hash
+		 FROM users WHERE email = $1`,
+		email,
+	)
+
+	var u User
+	var passwordHash string
+	if err := row.Scan(&u.ID, &u.Email, &u.Name, &u.CreatedAt, &passwordHash); err != nil {
+		return nil, ErrInvalidCredentials
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(password)); err != nil {
+		return nil, ErrInvalidCredentials
 	}
 
 	return &u, nil

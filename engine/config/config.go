@@ -11,6 +11,7 @@ type Config struct {
 	DatabaseUri    string
 	ServerPort     string
 	JWTSecret      string
+	APIKeySecret   string
 	DB_SYNC        bool
 	RABBITMQ_URL   string
 	GEMINI_API_KEY string
@@ -34,6 +35,7 @@ func LoadConfig() Config {
 		DatabaseUri:    os.Getenv("DATABASE_URL"),
 		ServerPort:     port,
 		JWTSecret:      os.Getenv("JWT_SECRET"),
+		APIKeySecret:   os.Getenv("API_KEY_ENCRYPTION_SECRET"),
 		DB_SYNC:        os.Getenv("DB_SYNC") == "true",
 		RABBITMQ_URL:   os.Getenv("RABBITMQ_URL"),
 		GEMINI_API_KEY: os.Getenv("GEMINI_API_KEY"),
