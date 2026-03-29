@@ -415,7 +415,7 @@ pnpm run dev
 
 ## Support
 
-For issues, questions, or contributions, please visit the [RagKit repository](https://github.com/yourusername/ragkit).
+For issues, questions, or contributions, please visit the [Rava repository](https://github.com/Prayas-35/rava).
 
 ## License
 
