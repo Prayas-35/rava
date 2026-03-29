@@ -1,5 +1,5 @@
 import { BadRequestException, Body, Controller, Post } from "@nestjs/common"
-import { type IngestMetadata, type IngestResponse, type QueryInput, type QueryResponse } from "rava"
+import { type IngestMetadata, type IngestResponse, type QueryInput, type QueryResponse } from "@rava-ai/sdk"
 import { IngestService } from "./services/ingest.service"
 import { QueryService } from "./services/query.service"
 

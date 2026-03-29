@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common"
-import { RavaClient, type QueryInput, type QueryResponse } from "rava"
+import { RavaClient, type QueryInput, type QueryResponse } from "@rava-ai/sdk"
 
 @Injectable()
 export class QueryService {

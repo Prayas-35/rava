@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common"
 import { resolve } from "node:path"
-import { RavaClient, type IngestInput, type IngestMetadata, type IngestResponse } from "rava"
+import { RavaClient, type IngestInput, type IngestMetadata, type IngestResponse } from "@rava-ai/sdk"
 
 interface IngestRequest {
   name: string

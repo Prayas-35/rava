@@ -1,7 +1,7 @@
 import "reflect-metadata"
 import { NestFactory } from "@nestjs/core"
 import { AppModule } from "./app.module"
-import { RavaClient } from "rava"
+import { RavaClient } from "@rava-ai/sdk"
 import * as dotenv from "dotenv"
 
 dotenv.config()

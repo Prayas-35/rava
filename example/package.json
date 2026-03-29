@@ -17,6 +17,7 @@
     "@nestjs/common": "^11.1.17",
     "@nestjs/core": "^11.1.17",
     "@nestjs/platform-express": "^11.1.17",
+    "@rava-ai/sdk": "^1.0.0",
     "dotenv": "^17.3.1",
     "rava": "link:../../../../.local/share/pnpm/global/5/node_modules/rava",
     "reflect-metadata": "^0.2.2",
