@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useAuth } from '@/components/auth-provider'
 
 type AuthMode = 'signup' | 'signin'
 
@@ -15,6 +16,7 @@ interface AuthResponse {
 export default function AuthPage() {
   const router = useRouter()
   const apiBaseUrl = process.env.NEXT_PUBLIC_ENGINE_URL ?? 'http://localhost:8080'
+  const { isLoading: authLoading, isAuthenticated, setToken } = useAuth()
 
   const [mode, setMode] = useState<AuthMode>('signup')
   const [email, setEmail] = useState('')
@@ -24,11 +26,10 @@ export default function AuthPage() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    const token = window.localStorage.getItem('rava_jwt')
-    if (token) {
+    if (!authLoading && isAuthenticated) {
       router.replace('/dashboard')
     }
-  }, [router])
+  }, [authLoading, isAuthenticated, router])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -53,13 +54,24 @@ export default function AuthPage() {
       }
 
       const data = (await res.json()) as AuthResponse
-      window.localStorage.setItem('rava_jwt', data.token)
+      setToken(data.token)
       router.replace('/dashboard')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Authentication failed')
     } finally {
       setLoading(false)
     }
+  }
+
+  if (authLoading) {
+    return (
+      <div className="dark min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="inline-flex items-center text-zinc-300">
+          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          Checking session...
+        </div>
+      </div>
+    )
   }
 
   return (

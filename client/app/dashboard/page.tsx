@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Copy, Loader2, Plus, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useAuth } from '@/components/auth-provider'
 import {
   Dialog,
   DialogContent,
@@ -36,8 +37,13 @@ interface ApiKey {
 export default function DashboardPage() {
   const router = useRouter()
   const apiBaseUrl = process.env.NEXT_PUBLIC_ENGINE_URL ?? 'http://localhost:8080'
+  const {
+    token,
+    isLoading: authLoading,
+    isAuthenticated,
+    clearToken,
+  } = useAuth()
 
-  const [token, setToken] = useState('')
   const [projects, setProjects] = useState<Project[]>([])
   const [keysByProject, setKeysByProject] = useState<Record<string, ApiKey[]>>({})
   const [projectName, setProjectName] = useState('')
@@ -72,7 +78,7 @@ export default function DashboardPage() {
     try {
       const projectsRes = await authedFetch('/api/projects')
       if (projectsRes.status === 401) {
-        window.localStorage.removeItem('rava_jwt')
+        clearToken()
         router.replace('/auth')
         return
       }
@@ -104,22 +110,21 @@ export default function DashboardPage() {
     } finally {
       setLoading(false)
     }
-  }, [authedFetch, router, token])
+  }, [authedFetch, clearToken, router, token])
 
   useEffect(() => {
-    const saved = window.localStorage.getItem('rava_jwt') ?? ''
-    if (!saved) {
+    if (authLoading) return
+
+    if (!isAuthenticated) {
       router.replace('/auth')
-      return
     }
-    setToken(saved)
-  }, [router])
+  }, [authLoading, isAuthenticated, router])
 
   useEffect(() => {
-    if (token) {
+    if (!authLoading && token) {
       void loadDashboard()
     }
-  }, [token, loadDashboard])
+  }, [authLoading, token, loadDashboard])
 
   async function handleCreateProject(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -193,8 +198,19 @@ export default function DashboardPage() {
   }
 
   function signOut() {
-    window.localStorage.removeItem('rava_jwt')
+    clearToken()
     router.replace('/auth')
+  }
+
+  if (authLoading) {
+    return (
+      <div className="dark min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="inline-flex items-center text-zinc-300">
+          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          Checking session...
+        </div>
+      </div>
+    )
   }
 
   return (
