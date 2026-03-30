@@ -23,6 +23,16 @@ yarn add @rava-ai/sdk
 
 ## Quick Start
 
+### Obtain an API Key
+
+Before initializing the SDK, create an API key from the Rava web app:
+
+1. Go to [ravaai.vercel.com](https://ravaai.vercel.com)
+2. Sign in to your account
+3. Open your dashboard
+4. Create a new key and copy it
+5. Store it securely (for example, in your `.env` file as `RAVA_API_KEY`)
+
 ### 1. Initialize the Client
 
 Initialize the Rava client once at your application startup:
